@@ -48,6 +48,16 @@ namespace Salesforce.Force.FunctionalTests
         }
 
         [Test]
+        public async Task Get_ApiUsage()
+        {
+            var accounts = await _client.QueryAsync<Account>("SELECT count() FROM Account");
+
+            Assert.IsNotNull(accounts);
+            Assert.IsNotNull(_client.ApiUsage);
+            Assert.IsNotEmpty(_client.ApiUsage);
+        }
+
+        [Test]
         public async Task AsyncTaskCompletion_ExpandoObject()
         {
             dynamic account = new ExpandoObject();

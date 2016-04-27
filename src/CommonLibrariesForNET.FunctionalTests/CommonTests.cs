@@ -44,6 +44,16 @@ namespace Salesforce.Common.FunctionalTests
         }
 
         [Test]
+        public async Task Get_LimitInfoHeader()
+        {
+            const string objectName = "Account";
+            var response = await _serviceHttpClient.HttpGetAsync<dynamic>(string.Format("sobjects/{0}", objectName));
+
+            Assert.IsNotNull(response);
+            Assert.IsNotNull(_serviceHttpClient.ApiUsage);
+        }
+
+        [Test]
         public async Task Get_UserInfo()
         {
             var response = await _serviceHttpClient.HttpGetAsync<UserInfo>(new Uri(_auth.Id));

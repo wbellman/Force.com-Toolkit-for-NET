@@ -21,6 +21,8 @@ namespace Salesforce.Common
         private HttpClient _httpClient;
         private readonly bool _disposeHttpClient;
 
+        public string ApiUsage { get; private set; }
+
         public ServiceHttpClient(string instanceUrl, string apiVersion, string accessToken, HttpClient httpClient = null)
         {
             _instanceUrl = instanceUrl;
@@ -70,6 +72,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info"); ;
+
                 var jToken = JToken.Parse(response);
                 if (jToken.Type == JTokenType.Array)
                 {
@@ -131,6 +135,8 @@ namespace Salesforce.Common
 
                     if (responseMessage.IsSuccessStatusCode)
                     {
+                        ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                         var jObject = JObject.Parse(response);
                         var jToken = jObject.GetValue(nodeName);
 
@@ -161,6 +167,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                 var r = JsonConvert.DeserializeObject<T>(response);
                 return r;
             }
@@ -203,6 +211,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                 var r = JsonConvert.DeserializeObject<T>(response);
                 return r;
             }
@@ -235,6 +245,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                 var r = JsonConvert.DeserializeObject<T>(response);
                 return r;
             }
@@ -275,6 +287,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                 if (responseMessage.StatusCode != System.Net.HttpStatusCode.NoContent)
                 {
                     var response = await responseMessage.Content.ReadAsDecompressedStringAsync().ConfigureAwait(false);
@@ -314,6 +328,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                 return true;
             }
 
@@ -357,6 +373,8 @@ namespace Salesforce.Common
 
             if (responseMessage.IsSuccessStatusCode)
             {
+                ApiUsage = GetCustomHeaderValue(responseMessage, "Sforce-Limit-Info");
+
                 var r = JsonConvert.DeserializeObject<T>(response);
                 return r;
             }
@@ -371,5 +389,20 @@ namespace Salesforce.Common
                 throw new ForceException(Error.NonJsonErrorResponse, response);
             }
         }
+
+        #region Private Methods
+        private static string GetCustomHeaderValue(HttpResponseMessage response, string headerName)
+        {
+            IEnumerable<string> headerValues;
+            var apiUsage = string.Empty;
+            var keyFound = response.Headers.TryGetValues(headerName, out headerValues);
+            if (keyFound)
+            {
+                apiUsage = headerValues.FirstOrDefault();
+            }
+
+            return apiUsage;
+        }
+        #endregion
     }
 }

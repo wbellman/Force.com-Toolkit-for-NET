@@ -13,6 +13,18 @@ namespace Salesforce.Force
     public class ForceClient : IForceClient, IDisposable
     {
         private readonly ServiceHttpClient _serviceHttpClient;
+        private string _apiUsage;
+        public string ApiUsage
+        {
+            get
+            {
+                return _serviceHttpClient.ApiUsage;
+            }
+            private set
+            {
+                _apiUsage = value;
+            }
+        }
 
         public ForceClient(string instanceUrl, string accessToken, string apiVersion, HttpClient httpClient = null)
         {
